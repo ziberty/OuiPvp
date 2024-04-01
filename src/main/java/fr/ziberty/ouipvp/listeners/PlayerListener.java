@@ -50,6 +50,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         Material material = event.getBlock().getType();
         if (!allowedBlocks.contains(material)) {
             event.setCancelled(true);
@@ -58,6 +59,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onPlayerBreakBlock(BlockBreakEvent event) {
+        if (event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
         Material material = event.getBlock().getType();
         if (!allowedBlocks.contains(material)) {
             event.setCancelled(true);
