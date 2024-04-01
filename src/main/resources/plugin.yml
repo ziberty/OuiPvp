@@ -1,0 +1,10 @@
+name: OuiPvp
+version: '${project.version}'
+main: fr.ziberty.ouipvp.OuiPvp
+api-version: '1.20'
+authors: [ ziberty ]
+description: Oui PVP tournament plugin
+commands:
+  config:
+    description: Ouvre le menu de configuration
+    permission: config.use
