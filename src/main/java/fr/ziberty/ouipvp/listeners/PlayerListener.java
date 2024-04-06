@@ -1,6 +1,7 @@
 package fr.ziberty.ouipvp.listeners;
 
 import fr.ziberty.ouipvp.Fight;
+import fr.ziberty.ouipvp.tasks.PreFightTask;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,7 +13,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 
 import java.util.List;
 
@@ -64,6 +66,29 @@ public class PlayerListener implements Listener {
         if (!allowedBlocks.contains(material)) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        event.setKeepInventory(true);
+        if (Fight.playerInFight(player)) {
+            Fight.endFight(player);
+            player.getInventory().clear();
+        }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        if (Fight.playerInFight(player) && !PreFightTask.canMove) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerEnterBed(PlayerSpawnChangeEvent event) {
+        event.setCancelled(true);
     }
 
 }

@@ -6,6 +6,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class StartFightArenaMenu {
 
     public static Inventory menu;
@@ -19,11 +21,13 @@ public class StartFightArenaMenu {
         ItemStack relief = ItemHelper.getItem(Material.COBBLED_DEEPSLATE_SLAB, 1, "§eRelief");
         ItemStack aqua = ItemHelper.getItem(Material.TRIDENT, 1, "§eAqua");
         ItemStack fly = ItemHelper.getItem(Material.ELYTRA, 1, "§eFly");
+        ItemStack random = ItemHelper.getItem(Material.RED_MUSHROOM_BLOCK, 1, "§eAléatoire", List.of("§7Sélection aléatoire parmi", "§7les arènes activées"));
         ItemStack retour = ItemHelper.getItem(Material.BARRIER, 1, "§cRetour");
-        menu.setItem(10, flat);
-        menu.setItem(12, relief);
-        menu.setItem(14, aqua);
-        menu.setItem(16, fly);
+        menu.setItem(9, flat);
+        menu.setItem(11, relief);
+        menu.setItem(13, aqua);
+        menu.setItem(15, fly);
+        menu.setItem(17, random);
         menu.setItem(22, retour);
         StartFightArenaMenu.menu = menu;
     }

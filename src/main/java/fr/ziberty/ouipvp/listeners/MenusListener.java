@@ -1,7 +1,10 @@
-package fr.ziberty.ouipvp.menus;
+package fr.ziberty.ouipvp.listeners;
 
 import fr.ziberty.ouipvp.Fight;
+import fr.ziberty.ouipvp.OuiPvp;
 import fr.ziberty.ouipvp.arenas.*;
+import fr.ziberty.ouipvp.helpers.InventoryHelper;
+import fr.ziberty.ouipvp.menus.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -26,6 +29,13 @@ public class MenusListener implements Listener {
     @EventHandler
     public void onPlayerCloseMenu(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
+        String menuTitle = event.getView().getTitle();
+        if (menuTitle.startsWith("Équipement - ")) {
+            saveEquipmentConfig(menuTitle.split("Équipement - ")[1], player);
+        }
+        if (menuTitle.startsWith("Loot Random - ")) {
+            saveRandomLootConfig(menuTitle.split("Loot Random - ")[1], player);
+        }
     }
 
     @EventHandler
@@ -38,14 +48,12 @@ public class MenusListener implements Listener {
 
         if (itemStack == null) return;
         ItemMeta itemMeta = itemStack.getItemMeta();
-        String itemName = itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : null;
+        String itemName = null;
+
+        if (itemStack.hasItemMeta() && itemMeta.hasDisplayName()) itemName = itemMeta.getDisplayName();
 
         if (itemName != null) {
             List<Inventory> menus = playerPreviousMenu.get(player.getUniqueId());
-            if (itemName.equalsIgnoreCase("§cRetour")) {
-                player.openInventory(menus.get(menus.size() - 1));
-                playerPreviousMenu.get(player.getUniqueId()).remove(menus.get(menus.size() - 1));
-            }
 
             if (menuTitle.startsWith("Équipement - ")) {
                 if (equipmentSlots.contains(event.getSlot())) event.setCancelled(true);
@@ -118,49 +126,49 @@ public class MenusListener implements Listener {
                 case "Équipement - Flat" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveEquipmentConfig("Flat");
+                        saveEquipmentConfig("Flat", player);
                     }
                 }
                 case "Équipement - Relief" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveEquipmentConfig("Relief");
+                        saveEquipmentConfig("Relief", player);
                     }
                 }
                 case "Équipement - Aqua" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveEquipmentConfig("Aqua");
+                        saveEquipmentConfig("Aqua", player);
                     }
                 }
                 case "Équipement - Fly" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveEquipmentConfig("Fly");
+                        saveEquipmentConfig("Fly", player);
                     }
                 }
                 case "Loot Random - Flat" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveRandomLootConfig("Flat");
+                        saveRandomLootConfig("Flat", player);
                     }
                 }
                 case "Loot Random - Relief" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveRandomLootConfig("Relief");
+                        saveRandomLootConfig("Relief", player);
                     }
                 }
                 case "Loot Random - Aqua" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveRandomLootConfig("Aqua");
+                        saveRandomLootConfig("Aqua", player);
                     }
                 }
                 case "Loot Random - Fly" -> {
                     if (itemName.equalsIgnoreCase("§cRetour")) {
                         event.setCancelled(true);
-                        saveRandomLootConfig("Fly");
+                        saveRandomLootConfig("Fly", player);
                     }
                 }
                 case "Commencer un combat" -> {
@@ -171,6 +179,20 @@ public class MenusListener implements Listener {
                         case "§eRelief" -> Fight.arena = new Relief();
                         case "§eAqua" -> Fight.arena = new Aqua();
                         case "§eFly" -> Fight.arena = new Fly();
+                        case "§eAléatoire" -> {
+                            List<Arena> arenas = new ArrayList<>();
+                            if (Flat.toggled) arenas.add(new Flat());
+                            if (Relief.toggled) arenas.add(new Relief());
+                            if (Aqua.toggled) arenas.add(new Aqua());
+                            if (Fly.toggled) arenas.add(new Fly());
+                            if (arenas.isEmpty()) {
+                                player.sendMessage("§cAucune arène active !");
+                            } else {
+                                Random random = new Random();
+                                int index = random.nextInt(arenas.size());
+                                Fight.arena = arenas.get(index);
+                            }
+                        }
                     }
                     if (Fight.arena != null) switchMenu(player, menu, new ChooseFirstPlayerMenu().getMenu());
                 }
@@ -196,6 +218,10 @@ public class MenusListener implements Listener {
                     }
                 }
             }
+            if (itemName.equalsIgnoreCase("§cRetour")) {
+                player.openInventory(menus.get(menus.size() - 1));
+                playerPreviousMenu.get(player.getUniqueId()).remove(menus.get(menus.size() - 1));
+            }
         }
     }
 
@@ -207,12 +233,18 @@ public class MenusListener implements Listener {
         player.openInventory(newMenu);
     }
 
-    private void saveEquipmentConfig(String arena) {
-
+    private void saveEquipmentConfig(String arena, Player player) {
+        Inventory menu = player.getOpenInventory().getTopInventory();
+        String base64Menu = InventoryHelper.inventoryToBase64(menu);
+        OuiPvp.config.set("arena." + arena + ".equipment", base64Menu);
+        OuiPvp.instance.saveConfig();
     }
 
-    private void saveRandomLootConfig(String arena) {
-
+    private void saveRandomLootConfig(String arena, Player player) {
+        Inventory menu = player.getOpenInventory().getTopInventory();
+        String base64Menu = InventoryHelper.inventoryToBase64(menu);
+        OuiPvp.config.set("arena." + arena + ".random_loot", base64Menu);
+        OuiPvp.instance.saveConfig();
     }
 
 }
