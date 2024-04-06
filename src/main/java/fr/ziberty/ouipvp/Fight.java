@@ -98,9 +98,7 @@ public class Fight {
             }
             case "wolf" -> {
                 p1.getInventory().addItem(new ItemStack(Material.WOLF_SPAWN_EGG, 3));
-                p1.getInventory().addItem(new ItemStack(Material.BONE, 64));
                 p2.getInventory().addItem(new ItemStack(Material.WOLF_SPAWN_EGG, 3));
-                p2.getInventory().addItem(new ItemStack(Material.BONE, 64));
                 Bukkit.broadcastMessage("§dRound spécial : Loups");
             }
             case "horse" -> {
