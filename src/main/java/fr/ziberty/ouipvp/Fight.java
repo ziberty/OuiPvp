@@ -72,6 +72,9 @@ public class Fight {
                 player.getActivePotionEffects().forEach(potionEffect -> player.removePotionEffect(potionEffect.getType()));
             }
             arena.reset();
+            player1 = null;
+            player2 = null;
+            arena = null;
         }, 100);
         for (Entity entity : OuiPvp.world.getEntities()) {
             if (entity instanceof Damageable mob) {
@@ -80,9 +83,6 @@ public class Fight {
                 }
             }
         }
-        player1 = null;
-        player2 = null;
-        arena = null;
     }
 
     public static void spawnEvent(String event) {

@@ -26,7 +26,7 @@ import java.util.List;
 
 public class PlayerListener implements Listener {
 
-    private final List<Material> allowedBlocks = List.of(Material.OAK_DOOR, Material.TNT, Material.LIGHT_BLUE_TERRACOTTA);
+    private final List<Material> allowedBlocks = List.of(Material.OAK_DOOR, Material.TNT, Material.LIGHT_BLUE_TERRACOTTA, Material.CAKE);
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
